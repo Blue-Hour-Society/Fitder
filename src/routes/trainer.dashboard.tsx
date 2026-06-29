@@ -175,17 +175,22 @@ function Dash() {
     <div className="space-y-8">
       <DailyReward />
 
-      <Hero action={nextAction} />
+      <Hero
+        action={nextAction}
+        pendingCount={pendingBookings.length}
+        upcomingCount={upcomingBookings.length}
+        activeClientCount={activeClientNames.length}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
-        <main className="space-y-6">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
+        <main className="space-y-5">
           <PendingRequests bookings={pendingBookings} />
           <UpcomingSchedule bookings={upcomingBookings} />
+          <RevenueSnapshot bookings={completedBookings} />
           <ActiveClients clientNames={activeClientNames} />
         </main>
 
-        <aside className="space-y-6">
-          <RevenueSnapshot bookings={completedBookings} />
+        <aside className="space-y-5">
           <AvailabilityHealth
             total={slots.length}
             booked={bookedSlots.length}
@@ -300,23 +305,40 @@ function getProfileMissingItems(profile: TrainerProfileSummary | null) {
   return missing;
 }
 
-function Hero({ action }: { action: NextAction }) {
+function Hero({
+  action,
+  pendingCount,
+  upcomingCount,
+  activeClientCount,
+}: {
+  action: NextAction;
+  pendingCount: number;
+  upcomingCount: number;
+  activeClientCount: number;
+}) {
   const Icon = action.icon;
   return (
-    <section className="rounded-xl border border-primary/40 bg-primary/10 p-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+    <section className="rounded-xl border border-primary/40 bg-primary/10 p-5 sm:p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:justify-between">
+        <div className="min-w-0 flex-1">
           <div className="text-xs uppercase tracking-widest text-primary">
             Trainer Command Center
           </div>
-          <h1 className="mt-2 font-display text-4xl font-bold">ภาพรวมสำหรับเทรนเนอร์</h1>
+          <h1 className="mt-2 font-display text-4xl font-bold leading-tight sm:text-5xl">
+            ภาพรวมสำหรับเทรนเนอร์
+          </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             ดูสิ่งที่ต้องทำต่อ จัดการคำขอจอง เปิดเวลาว่าง ดูลูกค้า และติดตามรายได้จากข้อมูลจริง
           </p>
+          <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
+            <HeroMiniStat icon={Clock} label="คำขอรออนุมัติ" value={pendingCount} />
+            <HeroMiniStat icon={Calendar} label="เซสชันถัดไป" value={upcomingCount} />
+            <HeroMiniStat icon={Users} label="ลูกค้า active" value={activeClientCount} />
+          </div>
         </div>
         <Link
           to={action.to}
-          className="group flex min-w-0 max-w-xl flex-col gap-3 rounded-lg border border-primary/40 bg-background/70 p-4 transition hover:border-primary sm:flex-row sm:items-center"
+          className="group flex min-w-0 max-w-xl flex-col gap-3 rounded-lg border border-primary/50 bg-background/80 p-4 shadow-sm transition hover:border-primary sm:flex-row sm:items-center lg:w-[38%]"
         >
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Icon className="h-6 w-6" />
@@ -336,18 +358,39 @@ function Hero({ action }: { action: NextAction }) {
   );
 }
 
+function HeroMiniStat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Calendar;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-primary/25 bg-background/70 px-3.5 py-2.5">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div>
+        <div className="font-display text-2xl font-bold leading-none text-foreground">{value}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{label}</div>
+      </div>
+    </div>
+  );
+}
+
 function PendingRequests({ bookings }: { bookings: TrainerBooking[] }) {
   return (
     <Panel>
-      <SectionHeader
-        icon={Clock}
-        title="คำขอจองที่รออนุมัติ"
-        subtitle="โอกาสรายได้ที่ต้องตอบกลับ"
-      />
+      <SectionHeader icon={Clock} title="คำขอจองที่รออนุมัติ" />
       {bookings.length === 0 ? (
-        <EmptyState title="ไม่มีคำขอจองที่รออยู่" text="เมื่อมีลูกค้าจอง เซสชันใหม่จะแสดงตรงนี้" />
+        <EmptyState
+          title="ยังไม่มีคำขอจองที่รออนุมัติ"
+          text="คำขอจองใหม่จากลูกค้าจะแสดงที่นี่ เพื่อให้คุณตอบรับและเปลี่ยนเป็นรายได้ได้เร็วขึ้น"
+        />
       ) : (
-        <div className="mt-4 space-y-3">
+        <div className="mt-3 space-y-2">
           {bookings.slice(0, 3).map((booking) => (
             <BookingRow key={booking.id} booking={booking} />
           ))}
@@ -361,20 +404,16 @@ function PendingRequests({ bookings }: { bookings: TrainerBooking[] }) {
 function UpcomingSchedule({ bookings }: { bookings: ReturnType<typeof getUpcomingBookings> }) {
   return (
     <Panel>
-      <SectionHeader
-        icon={Calendar}
-        title="ตารางถัดไป"
-        subtitle="เซสชัน pending/accepted ที่มีวันเวลาในอนาคต"
-      />
+      <SectionHeader icon={Calendar} title="ตารางถัดไป" />
       {bookings.length === 0 ? (
         <EmptyState
           title="ยังไม่มีเซสชันที่กำลังจะมาถึง"
-          text="เปิดเวลาว่างเพิ่ม เพื่อให้ลูกค้าสามารถจองเซสชันกับคุณได้"
+          text="เซสชันที่ยืนยันแล้วจะแสดงที่นี่ ลองเพิ่มเวลาว่างเพื่อให้ลูกค้าจองรอบถัดไปได้"
           to="/trainer/availability"
           cta="เพิ่มเวลาว่าง"
         />
       ) : (
-        <div className="mt-4 space-y-3">
+        <div className="mt-3 space-y-2">
           {bookings.slice(0, 4).map((booking) => (
             <BookingRow key={booking.id} booking={booking} />
           ))}
@@ -387,9 +426,11 @@ function UpcomingSchedule({ bookings }: { bookings: ReturnType<typeof getUpcomin
 
 function BookingRow({ booking }: { booking: TrainerBooking }) {
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <div className="font-display text-lg font-semibold">{booking.client_name ?? "ลูกค้า"}</div>
+        <div className="font-display text-base font-semibold">
+          {booking.client_name ?? "ลูกค้า"}
+        </div>
         <div className="mt-1 text-sm text-muted-foreground">
           {formatDate(booking.slot?.date)} เวลา {booking.slot?.start_time?.slice(0, 5) ?? "-"} -{" "}
           {booking.slot?.end_time?.slice(0, 5) ?? "-"}
@@ -410,26 +451,22 @@ function BookingRow({ booking }: { booking: TrainerBooking }) {
 function ActiveClients({ clientNames }: { clientNames: string[] }) {
   return (
     <Panel>
-      <SectionHeader
-        icon={Users}
-        title="ลูกค้าที่กำลังดูแล"
-        subtitle="จาก booking ที่ accepted หรือ completed"
-      />
+      <SectionHeader icon={Users} title="ลูกค้าที่กำลังดูแล" />
       {clientNames.length === 0 ? (
         <EmptyState
-          title="ยังไม่มีลูกค้าที่ active"
-          text="เมื่อมีการจองที่ยืนยันแล้ว รายชื่อลูกค้าจะปรากฏในส่วนนี้"
+          title="ยังไม่มีลูกค้า active"
+          text="ลูกค้าจะแสดงที่นี่หลังมี booking ที่ accepted หรือ completed"
           to="/trainer/availability"
           cta="เปิดเวลาว่าง"
         />
       ) : (
-        <div className="mt-5 space-y-4">
+        <div className="mt-4 space-y-3">
           <div className="font-display text-4xl font-bold text-primary">{clientNames.length}</div>
           <div className="grid gap-3 sm:grid-cols-3">
             {clientNames.slice(0, 3).map((name) => (
               <div
                 key={name}
-                className="flex items-center gap-3 rounded-lg border border-border bg-background p-3"
+                className="flex items-center gap-3 rounded-lg border border-border bg-background p-2.5"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
                   {name[0]?.toUpperCase() ?? <UserRound className="h-4 w-4" />}
@@ -458,11 +495,7 @@ function RevenueSnapshot({ bookings }: { bookings: TrainerBooking[] }) {
 
   return (
     <Panel>
-      <SectionHeader
-        icon={Wallet}
-        title="Revenue Snapshot"
-        subtitle="จาก completed bookings เท่านั้น"
-      />
+      <SectionHeader icon={Wallet} title="Revenue Snapshot" />
       <div className="mt-5 grid gap-3">
         <Metric label="เซสชันที่เสร็จสิ้น" value={bookings.length} icon={CheckCircle2} />
         <Metric label="รายได้รวม" value={formatTHB(gross)} icon={Wallet} />
@@ -485,7 +518,7 @@ function AvailabilityHealth({
 }) {
   return (
     <Panel>
-      <SectionHeader icon={Zap} title="Availability Health" subtitle="ความพร้อมในการรับ booking" />
+      <SectionHeader icon={Zap} title="Availability Health" />
       <div className="mt-5 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
         <Metric label="ทั้งหมด" value={total} icon={Calendar} />
         <Metric label="ถูกจอง" value={booked} icon={CheckCircle2} />
@@ -506,15 +539,15 @@ function QuickActions() {
 
   return (
     <Panel>
-      <SectionHeader icon={Search} title="Quick Actions" subtitle="ไปยังงานสำคัญของ trainer" />
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      <SectionHeader icon={Search} title="Quick Actions" />
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         {actions.map((action) => (
           <Link
             key={action.to}
             to={action.to}
-            className="flex items-center gap-3 rounded-lg border border-border bg-background p-3 text-sm font-semibold transition hover:border-primary hover:text-primary"
+            className="flex min-h-16 items-center gap-3 rounded-lg border border-primary/20 bg-background px-4 py-4 text-sm font-semibold transition hover:border-primary hover:bg-primary/10 hover:text-primary"
           >
-            <action.icon className="h-4 w-4 text-primary" />
+            <action.icon className="h-5 w-5 text-primary" />
             {action.label}
           </Link>
         ))}
@@ -536,25 +569,35 @@ function ProfileRating({
 }) {
   return (
     <Panel>
-      <SectionHeader
-        icon={Star}
-        title="Profile / Rating"
-        subtitle="ข้อมูลที่ลูกค้าใช้ตัดสินใจก่อนจอง"
-      />
-      <div className="mt-5 space-y-3">
-        <Metric
-          label="Rating"
-          value={`${Number(profile?.rating ?? 0).toFixed(1)} / 5`}
-          icon={Star}
-        />
-        <Metric label="Reviews" value={profile?.rating_count ?? 0} icon={Users} />
+      <SectionHeader icon={Star} title="Profile / Rating" />
+      <div className="mt-4 space-y-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-3.5">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+              <Star className="h-4 w-4" />
+              Rating
+            </div>
+            <div className="mt-2 font-display text-3xl font-bold text-primary">
+              {Number(profile?.rating ?? 0).toFixed(1)}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">จาก 5 คะแนน</div>
+          </div>
+          <div className="rounded-lg border border-border bg-background p-3.5">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
+              <Users className="h-4 w-4 text-primary" />
+              Reviews
+            </div>
+            <div className="mt-2 font-display text-3xl font-bold">{profile?.rating_count ?? 0}</div>
+            <div className="mt-1 text-xs text-muted-foreground">รีวิวจากลูกค้า</div>
+          </div>
+        </div>
         <Metric
           label="ราคา/เซสชัน"
           value={formatTHB(profile?.price_per_session ?? 0)}
           icon={Wallet}
         />
 
-        <div className="rounded-lg border border-border bg-background p-4">
+        <div className="rounded-lg border border-border bg-background p-3.5">
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="font-semibold">รับลูกค้าอัตโนมัติ</div>
@@ -575,13 +618,15 @@ function ProfileRating({
         </div>
 
         {missingItems.length > 0 ? (
-          <div className="rounded-lg border border-warning/30 bg-warning/10 p-4">
-            <div className="font-semibold text-warning">โปรไฟล์ยังควรเติมข้อมูล</div>
-            <p className="mt-1 text-sm text-muted-foreground">{missingItems.join(", ")}</p>
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-3.5">
+            <div className="font-semibold text-primary">คำแนะนำเพื่อให้โปรไฟล์พร้อมรับลูกค้า</div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              เติมข้อมูล: {missingItems.join(", ")}
+            </p>
             <DashboardLink to="/trainer/profile" label="อัปเดตโปรไฟล์" />
           </div>
         ) : (
-          <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-sm text-muted-foreground">
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-3.5 text-sm text-muted-foreground">
             โปรไฟล์มีข้อมูลหลักพร้อมให้ลูกค้าพิจารณาแล้ว
           </div>
         )}
@@ -596,14 +641,17 @@ function AiOpportunityCard() {
       <SectionHeader
         icon={Bot}
         title="AI Coaching Insights"
-        subtitle="Roadmap ที่เคารพความเป็นส่วนตัวของลูกค้า"
+        subtitle="Roadmap: ใช้ได้เมื่อมี consent และ RLS รองรับ"
       />
-      <p className="mt-4 text-sm text-muted-foreground">
-        เมื่อผู้ใช้งานยินยอมแชร์ข้อมูล AI คุณจะสามารถดูข้อมูลการฝึกเพื่อช่วยปรับฟอร์มได้ ตอนนี้
-        dashboard จะไม่อ่านคะแนน AI ของลูกค้า เพื่อเคารพสิทธิ์การเข้าถึงข้อมูลและ RLS
+      <div className="mt-3 inline-flex rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
+        Roadmap / Coming Soon
+      </div>
+      <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+        การ์ดนี้ยังไม่อ่านข้อมูล AI ของลูกค้าในปัจจุบัน เมื่อผู้ใช้งานยินยอมแชร์ข้อมูลและ RLS รองรับ
+        เทรนเนอร์จึงจะเห็น insight เพื่อช่วยวางแผนการโค้ชได้อย่างเหมาะสม
       </p>
-      <div className="mt-4 rounded-lg border border-border bg-background p-4 text-xs text-muted-foreground">
-        Product loop: ลูกค้าใช้ AI ตรวจท่า → เลือกแชร์ insight → เทรนเนอร์ช่วยปรับฟอร์ม → เกิด
+      <div className="mt-3 rounded-lg border border-border bg-background px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+        Product loop: ลูกค้าใช้ AI ตรวจท่า - เลือกแชร์ insight - เทรนเนอร์ช่วยปรับฟอร์ม - เกิด
         booking และรายได้ซ้ำ
       </div>
     </Panel>
@@ -657,7 +705,9 @@ function SectionHeader({
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <section className="rounded-xl border border-border bg-card p-5">{children}</section>;
+  return (
+    <section className="rounded-xl border border-border bg-card p-4 sm:p-5">{children}</section>
+  );
 }
 
 function EmptyState({
@@ -672,13 +722,13 @@ function EmptyState({
   cta?: string;
 }) {
   return (
-    <div className="mt-4 rounded-xl border border-dashed border-border p-6 text-center">
-      <div className="font-display text-lg font-semibold">{title}</div>
-      <p className="mt-2 text-sm text-muted-foreground">{text}</p>
+    <div className="mt-3 rounded-lg border border-dashed border-border px-3 py-3.5 text-center">
+      <div className="font-display text-base font-semibold">{title}</div>
+      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{text}</p>
       {to && cta && (
         <Link
           to={to}
-          className="mt-4 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
+          className="mt-2.5 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3.5 py-1.5 text-sm font-bold text-primary-foreground"
         >
           {cta}
           <ArrowRight className="h-4 w-4" />

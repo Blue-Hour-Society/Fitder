@@ -20,33 +20,28 @@ const botnoiAttributes = {
   locale: "th",
   logged_in_greeting: "สวัสดีครับ ต้องการให้ Fitder ช่วยเรื่องอะไรดี?",
   greeting_message: "คุยกับ Fitder AI ได้เลยครับ",
-  default_open: "false",
+  default_open: "true",
 };
 
-export function ChatBot() {
+export function ChatBot({ active }: { active: boolean }) {
   useEffect(() => {
     const initBotnoi = () => window.BN?.init({ version: "1.0" });
-    const existingScript = document.getElementById(BOTNOI_SDK_ID) as HTMLScriptElement | null;
-
-    if (existingScript) {
-      initBotnoi();
+    if (document.getElementById(BOTNOI_SDK_ID)) {
       return;
     }
 
-    const firstScript = document.getElementsByTagName("script")[0];
     const script = document.createElement("script");
     script.id = BOTNOI_SDK_ID;
     script.src = BOTNOI_SDK_SRC;
     script.async = true;
     script.onload = initBotnoi;
-
-    firstScript.parentNode?.insertBefore(script, firstScript);
+    document.head.appendChild(script);
   }, []);
 
   return (
-    <>
+    <div className={active ? "" : "hidden"}>
       <div id="bn-root" />
       <div className="bn-customerchat" {...botnoiAttributes} />
-    </>
+    </div>
   );
 }

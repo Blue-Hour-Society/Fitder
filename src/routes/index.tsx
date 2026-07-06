@@ -43,14 +43,14 @@ function Landing() {
               Fitder
             </span>
           </Link>
-          <div className="hidden items-center gap-8 text-sm md:flex">
-            <Link to="/about" className="text-muted-foreground hover:text-foreground">
+          <div className="hidden items-center gap-10 text-base md:flex">
+            <a href="#about" className="text-muted-foreground transition hover:text-foreground">
               {t("common.about")}
-            </Link>
-            <a href="#how" className="text-muted-foreground hover:text-foreground">
+            </a>
+            <a href="#how" className="text-muted-foreground transition hover:text-foreground">
               {t("common.how_it_works")}
             </a>
-            <a href="#features" className="text-muted-foreground hover:text-foreground">
+            <a href="#features" className="text-muted-foreground transition hover:text-foreground">
               {t("common.features")}
             </a>
           </div>
@@ -85,19 +85,16 @@ function Landing() {
         <div className="absolute inset-0 grid-bg opacity-30" />
         <div className="absolute left-1/2 top-0 -z-0 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-primary/20 blur-[160px]" />
         <div className="relative mx-auto max-w-7xl px-6 pt-24 pb-28 text-center lg:pt-32 lg:pb-40">
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-4 py-1.5 text-xs uppercase tracking-widest text-muted-foreground backdrop-blur">
-            <Sparkles className="h-3 w-3 text-primary" />
-            AI-Powered Trainer Matching
+          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-4 py-1.5 text-sm tracking-wide text-muted-foreground backdrop-blur">
+            <Sparkles className="h-4 w-4 text-primary" />
+            {t("landing.hero_badge")}
           </div>
-          <h1 className="mx-auto max-w-4xl font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl lg:text-8xl">
-            {t("landing.hero_title").split("perfect").map((part, i, arr) => (
-              <span key={i}>
-                {part}
-                {i < arr.length - 1 && <span className="text-gradient-lime">perfect</span>}
-              </span>
-            ))}
+          <h1 className="mx-auto max-w-4xl font-display text-5xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
+            {t("landing.hero_title_1")}
+            <span className="text-gradient-lime">{t("landing.hero_highlight")}</span>
+            {t("landing.hero_title_2")}
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
             {t("landing.hero_subtitle")}
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -138,53 +135,51 @@ function Landing() {
       <section id="features" className="border-t border-border bg-surface/30 py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-16 max-w-2xl">
-            <div className="text-xs uppercase tracking-widest text-primary">Platform</div>
-            <h2 className="mt-3 font-display text-4xl font-bold md:text-5xl">
-              Everything you need to train smarter.
+            <div className="text-sm tracking-wide text-primary">{t("common.features")}</div>
+            <h2 className="mt-3 font-display text-4xl font-bold leading-tight md:text-5xl">
+              {t("landing.features_title")}
             </h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {[
               {
                 icon: Sparkles,
-                title: "AI Matching",
-                body: "Compatibility scoring across goals, budget, distance, schedule, and experience.",
+                title: t("landing.feature_1_title"),
+                body: t("landing.feature_1_desc"),
               },
               {
                 icon: Calendar,
-                title: "Instant Booking",
-                body: "Real-time availability with double-booking protection and live status updates.",
+                title: t("landing.feature_2_title"),
+                body: t("landing.feature_2_desc"),
               },
               {
                 icon: Activity,
-                title: "Pose Correction",
-                body: "Train with built-in posture feedback. Track your form score over time.",
+                title: t("landing.feature_3_title"),
+                body: t("landing.feature_3_desc"),
               },
               {
                 icon: MapPin,
-                title: "Nearby Trainers",
-                body: "Distance-aware discovery surfaces coaches in your area, sorted by relevance.",
+                title: t("landing.feature_4_title"),
+                body: t("landing.feature_4_desc"),
               },
               {
                 icon: CheckCircle2,
-                title: "Verified Coaches",
-                body: "Admin-vetted profiles with certifications, specialties, and client reviews.",
+                title: t("landing.feature_5_title"),
+                body: t("landing.feature_5_desc"),
               },
               {
                 icon: Dumbbell,
-                title: "All Goals",
-                body: "Weight loss, muscle gain, strength, recomposition — find a specialist.",
+                title: t("landing.feature_6_title"),
+                body: t("landing.feature_6_desc"),
               },
-            ].map((f) => (
+            ].map((feature, i) => (
               <div
-                key={f.title}
-                className="group rounded-xl border border-border bg-card p-6 transition hover:border-primary/50"
+                key={i}
+                className="group rounded-xl border border-border bg-background p-6 transition hover:border-primary/50"
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
-                  <f.icon className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-lg font-semibold">{f.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{f.body}</p>
+                <feature.icon className="mb-4 h-6 w-6 text-primary" />
+                <h3 className="font-display text-lg font-bold">{feature.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{feature.body}</p>
               </div>
             ))}
           </div>
@@ -195,38 +190,51 @@ function Landing() {
       <section id="how" className="py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-16 text-center">
-            <div className="text-xs uppercase tracking-widest text-primary">How it works</div>
-            <h2 className="mt-3 font-display text-4xl font-bold md:text-5xl">
-              Three steps to your next session.
+            <div className="text-sm tracking-wide text-primary">{t("landing.how_title")}</div>
+            <h2 className="mt-3 font-display text-4xl font-bold leading-tight md:text-5xl">
+              {t("landing.how_heading")}
             </h2>
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             {[
-              ["01", "Set your goals", "Tell us your goal, budget, and schedule."],
-              ["02", "Get matched", "See ranked trainers with compatibility scores."],
-              ["03", "Book & train", "Pick a slot, get confirmed, start training."],
-            ].map(([n, t, d]) => (
+              ["01", t("landing.step_1_title"), t("landing.step_1_desc")],
+              ["02", t("landing.step_2_title"), t("landing.step_2_desc")],
+              ["03", t("landing.step_3_title"), t("landing.step_3_desc")],
+            ].map(([n, tStr, d]) => (
               <div key={n} className="relative rounded-xl border border-border bg-card p-8">
                 <div className="font-display text-6xl font-bold text-primary/30">{n}</div>
-                <h3 className="mt-4 font-display text-xl font-semibold">{t}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{d}</p>
+                <h3 className="mt-4 font-display text-xl font-semibold">{tStr}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* About */}
+      <section id="about" className="border-t border-border bg-surface/30 py-24">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <div className="text-sm tracking-wide text-primary">{t("common.about")}</div>
+          <h2 className="mt-3 font-display text-4xl font-bold leading-tight md:text-5xl">
+            {t("landing.about_title")}
+          </h2>
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+            {t("landing.about_mission_desc")}
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="border-t border-border bg-primary text-primary-foreground">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-6 py-20 text-center">
-          <h2 className="font-display text-4xl font-bold md:text-5xl">
-            Ready to find your coach?
+          <h2 className="font-display text-4xl font-bold leading-tight md:text-5xl">
+            {t("landing.cta_heading")}
           </h2>
           <Link
             to={user ? dashHref : "/register"}
             className="rounded-md bg-background px-7 py-3.5 font-display text-base font-bold text-foreground transition hover:opacity-90"
           >
-            Get started — it's free
+            {t("landing.cta_button")}
           </Link>
         </div>
       </section>
@@ -234,7 +242,7 @@ function Landing() {
       <footer className="border-t border-border bg-background py-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 text-sm text-muted-foreground">
           <span>© {new Date().getFullYear()} Fitder</span>
-          <Link to="/about" className="hover:text-foreground">About</Link>
+          <a href="#about" className="transition hover:text-foreground">{t("common.about")}</a>
         </div>
       </footer>
     </div>

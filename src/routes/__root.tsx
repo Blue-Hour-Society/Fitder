@@ -9,7 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
-import { ChatBot } from "@/components/layout/ChatBot";
+import { AssistantHub } from "@/components/layout/AssistantHub";
+import { useAuth } from "@/hooks/use-auth";
 import "@/i18n";
 
 import appCss from "../styles.css?url";
@@ -120,9 +121,16 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
-        <ChatBot />
+        <AuthGatedAssistant />
         <Toaster richColors position="top-right" />
       </AuthProvider>
     </QueryClientProvider>
   );
+}
+
+/** Renders AssistantHub only when the user is logged in. */
+function AuthGatedAssistant() {
+  const { user } = useAuth();
+  if (!user) return null;
+  return <AssistantHub />;
 }

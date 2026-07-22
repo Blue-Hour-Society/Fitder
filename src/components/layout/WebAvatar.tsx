@@ -39,7 +39,7 @@ export function WebAvatar({ className }: WebAvatarProps) {
       avatarUrl: "Volley",
       greetingInstruction: "",
       enableBubble: "true",
-      cameraOffset: "0,0,0",
+      cameraOffset: "0,-0.1,0.1",
       container,
     };
 

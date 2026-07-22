@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { MessageCircle, Mic, X } from "lucide-react";
+import { useLocation } from "@tanstack/react-router";
 import { ChatBot } from "@/components/layout/ChatBot";
 import { WebAvatar } from "@/components/layout/WebAvatar";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,8 @@ type HubMode = "idle" | "menu" | "chat" | "avatar";
 export function AssistantHub() {
   const [mode, setMode] = useState<HubMode>("idle");
   const menuRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const isChatPage = location.pathname.includes("/chat");
 
   const toggleMenu = useCallback(() => {
     setMode((prev) => (prev === "menu" ? "idle" : prev === "idle" ? "menu" : "idle"));
@@ -41,6 +44,8 @@ export function AssistantHub() {
   // When chat mode is selected, we render the ChatBot (which injects the Botnoi SDK)
   // and programmatically trigger it to open.
   // When avatar mode is selected, we render WebAvatar.
+
+  if (isChatPage) return null;
 
   return (
     <>

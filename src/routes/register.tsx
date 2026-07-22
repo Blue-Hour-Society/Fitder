@@ -38,8 +38,8 @@ function Register() {
       toast.error(error.message);
       return;
     }
-    toast.success("Account created — signing you in…");
-    setTimeout(() => nav({ to: `/${role}/dashboard` as never }), 800);
+    toast.success("Account created — complete your profile to get started");
+    setTimeout(() => nav({ to: `/${role}/profile` as never }), 800);
   };
 
   return (
@@ -54,9 +54,7 @@ function Register() {
           <span className="font-display text-xl font-bold">Fitder</span>
         </Link>
         <h1 className="font-display text-3xl font-bold">{t("auth.register_title")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {t("auth.register_subtitle")}
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{t("auth.register_subtitle")}</p>
 
         <div className="mt-6 grid grid-cols-2 gap-2 rounded-lg border border-border p-1">
           {(["client", "trainer"] as const).map((r) => (
@@ -78,7 +76,9 @@ function Register() {
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">{t("auth.full_name")}</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
+              {t("auth.full_name")}
+            </label>
             <input
               required
               value={fullName}
@@ -87,7 +87,9 @@ function Register() {
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">{t("auth.email")}</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
+              {t("auth.email")}
+            </label>
             <input
               type="email"
               required
@@ -97,7 +99,9 @@ function Register() {
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">{t("auth.password")}</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
+              {t("auth.password")}
+            </label>
             <input
               type="password"
               required

@@ -97,15 +97,28 @@ function TrainerDetail() {
     queryKey: ["slots", id],
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const { data } = await supabase
-        .from("availability_slots")
-        .select("*")
-        .eq("trainer_id", id)
-        .eq("is_booked", false)
-        .gte("date", today)
-        .order("date")
-        .order("start_time");
-      return data ?? [];
+      
+      const [slotsRes, bookingsRes] = await Promise.all([
+        supabase
+          .from("availability_slots")
+          .select("*")
+          .eq("trainer_id", id)
+          .eq("is_booked", false)
+          .gte("date", today)
+          .order("date")
+          .order("start_time"),
+        supabase
+          .from("bookings")
+          .select("slot_id")
+          .eq("trainer_id", id)
+          .in("booking_status", ["pending", "accepted"])
+      ]);
+
+      const availableSlots = slotsRes.data ?? [];
+      const activeBookings = bookingsRes.data ?? [];
+      const bookedSlotIds = new Set(activeBookings.map(b => b.slot_id));
+
+      return availableSlots.filter(s => !bookedSlotIds.has(s.id));
     },
   });
 

@@ -7,7 +7,7 @@ import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon, Check, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { format, startOfWeek, addDays, startOfDay, isSameDay, parseISO, isBefore } from "date-fns";
+import { format, startOfWeek, addDays, startOfDay, isSameDay, isBefore, addHours } from "date-fns";
 
 export const Route = createFileRoute("/trainer/availability")({
   component: () => <RoleGuard role="trainer"><Avail /></RoleGuard>,
@@ -23,17 +23,27 @@ function Avail() {
   const weekStart = useMemo(() => startOfWeek(currentDate, { weekStartsOn: 1 }), [currentDate]);
   const weekDays = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
 
-  const { data: slots, isLoading } = useQuery({
+  const { data: slotsData, isLoading } = useQuery({
     queryKey: ["my-slots", user?.id],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("availability_slots")
-        .select("*")
-        .eq("trainer_id", user!.id);
-      return data ?? [];
+      const [slotsRes, bookingsRes] = await Promise.all([
+        supabase.from("availability_slots").select("*").eq("trainer_id", user!.id),
+        supabase.from("bookings").select("slot_id, booking_status").eq("trainer_id", user!.id).in("booking_status", ["pending", "accepted"])
+      ]);
+      
+      const slots = slotsRes.data ?? [];
+      const bookings = bookingsRes.data ?? [];
+      
+      // Map bookings to slots so we have accurate is_booked status
+      return slots.map(slot => ({
+        ...slot,
+        is_booked: slot.is_booked || bookings.some(b => b.slot_id === slot.id)
+      }));
     },
     enabled: !!user,
   });
+
+  const slots = slotsData;
 
   const [toggling, setToggling] = useState<string | null>(null);
 
@@ -128,14 +138,14 @@ function Avail() {
                     const dateStr = format(day, "yyyy-MM-dd");
                     const startTime = `${hour.toString().padStart(2, "0")}:00:00`;
                     const slot = slots?.find(s => s.date === dateStr && s.start_time === startTime);
-                    const isPast = isBefore(addDays(startOfDay(day), hour/24), new Date());
+                    const isPast = isBefore(addHours(startOfDay(day), hour), new Date());
                     const key = `${dateStr}-${startTime}`;
                     const isLoading = toggling === key;
 
                     return (
                       <td key={key} className="border-b border-border p-1">
                         <button
-                          disabled={isPast || slot?.is_booked}
+                          disabled={isPast && !slot}
                           onClick={() => toggleSlot(day, hour)}
                           className={cn(
                             "relative flex h-14 w-full flex-col items-center justify-center rounded-lg border-2 transition-all",

@@ -72,14 +72,17 @@ function Discover() {
       </div>
 
       <div className="grid gap-4 rounded-xl border border-border bg-card p-5 md:grid-cols-4">
-        <div className="relative md:col-span-2">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            placeholder="Search by name…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            className="w-full rounded-md border border-input bg-background py-2.5 pl-10 pr-3 text-sm focus:border-primary focus:outline-none"
-          />
+        <div className="md:col-span-2">
+          <label className="text-xs uppercase tracking-widest text-muted-foreground">ค้นหา</label>
+          <div className="relative mt-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              placeholder="Search by name…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="w-full rounded-md border border-input bg-background py-2 pl-10 pr-3 text-sm focus:border-primary focus:outline-none"
+            />
+          </div>
         </div>
         <div>
           <label className="text-xs uppercase tracking-widest text-muted-foreground">ราคาสูงสุด {formatTHB(maxPrice)}</label>

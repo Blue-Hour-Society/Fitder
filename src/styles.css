@@ -267,6 +267,71 @@
   height: 100%;
 }
 
+/* ─── WebAvatar Speech Bubble Overrides ─── */
+
+/* Bubble container: keep inside viewport, position at bottom of avatar */
+#bcw-rt-bubble-container {
+  top: auto !important;
+  bottom: 12px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(360px, calc(100vw - 48px)) !important;
+  max-width: 100% !important;
+  pointer-events: auto !important;
+}
+
+/* When inside a widget-mode avatar */
+.bcw-rt-avatar-widget #bcw-rt-bubble-container {
+  bottom: 12px !important;
+  top: auto !important;
+  width: min(300px, 85vw) !important;
+}
+
+/* When inside a fullscreen-mode avatar */
+.bcw-rt-avatar-fullscreen #bcw-rt-bubble-container {
+  bottom: 80px !important;
+  top: auto !important;
+  width: min(420px, 80vw) !important;
+}
+
+/* When bubble is inside our custom overlay container */
+.assistant-avatar-overlay #bcw-rt-bubble-container {
+  position: absolute !important;
+  bottom: 12px !important;
+  top: auto !important;
+  width: min(340px, calc(100% - 24px)) !important;
+}
+
+/* The bubble itself: constrain height, allow scrolling, compact text */
+.bcw-rt-bubble {
+  max-height: 160px !important;
+  overflow-y: auto !important;
+  padding: 12px 18px !important;
+  font-size: clamp(12px, 1.8vw, 15px) !important;
+  line-height: 1.45 !important;
+  border-radius: 20px !important;
+  word-break: break-word !important;
+  text-align: left !important;
+}
+
+/* Hide the cartoon tail (arrow) since bubble is now at bottom */
+.bcw-rt-bubble::after,
+.bcw-rt-bubble::before {
+  display: none !important;
+}
+
+/* Subtle scrollbar inside bubble */
+.bcw-rt-bubble::-webkit-scrollbar {
+  width: 4px;
+}
+.bcw-rt-bubble::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bcw-rt-bubble::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
 /* Mobile adjustments */
 @media (max-width: 480px) {
   .assistant-hub {
@@ -279,5 +344,15 @@
     right: 16px;
     width: calc(100vw - 32px);
     height: calc(100vh - 120px);
+  }
+
+  .bcw-rt-bubble {
+    max-height: 120px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  #bcw-rt-bubble-container {
+    width: min(280px, calc(100vw - 32px)) !important;
   }
 }
